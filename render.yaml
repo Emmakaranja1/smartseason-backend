@@ -19,7 +19,7 @@ services:
         generateValue: true
 
   # PostgreSQL Database
-  - type: postgres
+  - type: psql
     name: smartseason-db
     plan: free
     databaseName: smartseason_db_7cm7
