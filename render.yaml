@@ -22,5 +22,5 @@ services:
   - type: postgres
     name: smartseason-db
     plan: free
-    databaseName: smartseason
-    user: smartseason_user
+    databaseName: smartseason_db_7cm7
+    user: smartseason_db_7cm7_user
