@@ -3,3 +3,6 @@ node_modules
 .env
 
 /src/generated/prisma
+
+# Hide database seed file with sensitive data
+prisma/seed.js
