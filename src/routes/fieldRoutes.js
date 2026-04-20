@@ -8,6 +8,7 @@ const {
   updateFieldController,
   deleteFieldController
 } = require('../controllers/fieldController');
+const fieldUpdateRoutes = require('./fieldUpdateRoutes');
 
 const router = express.Router();
 
@@ -45,5 +46,8 @@ router.delete('/:id',
   requireAdmin, 
   deleteFieldController
 );
+
+// Field update routes (nested under /api/fields/:id)
+router.use('/:id/updates', authenticateToken, fieldUpdateRoutes);
 
 module.exports = router;

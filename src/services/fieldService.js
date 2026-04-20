@@ -1,4 +1,5 @@
 const { PrismaClient } = require('@prisma/client');
+const { calculateFieldStatus } = require('./fieldStatusService');
 
 const prisma = new PrismaClient();
 
@@ -40,7 +41,13 @@ const createField = async (fieldData) => {
     }
   });
 
-  return field;
+  // Add computed status
+  const status = await calculateFieldStatus(field);
+  
+  return {
+    ...field,
+    status
+  };
 };
 
 const getFields = async (userRole, userId) => {
@@ -83,7 +90,18 @@ const getFields = async (userRole, userId) => {
     });
   }
 
-  return fields;
+  // Add computed status to each field
+  const fieldsWithStatus = await Promise.all(
+    fields.map(async (field) => {
+      const status = await calculateFieldStatus(field);
+      return {
+        ...field,
+        status
+      };
+    })
+  );
+
+  return fieldsWithStatus;
 };
 
 const getFieldById = async (fieldId, userRole, userId) => {
@@ -109,7 +127,13 @@ const getFieldById = async (fieldId, userRole, userId) => {
     throw { status: 403, message: 'Access denied - field not assigned to you' };
   }
 
-  return field;
+  // Add computed status
+  const status = await calculateFieldStatus(field);
+  
+  return {
+    ...field,
+    status
+  };
 };
 
 const updateField = async (fieldId, fieldData) => {
@@ -161,7 +185,13 @@ const updateField = async (fieldId, fieldData) => {
     }
   });
 
-  return field;
+  // Add computed status
+  const status = await calculateFieldStatus(field);
+  
+  return {
+    ...field,
+    status
+  };
 };
 
 const deleteField = async (fieldId) => {
