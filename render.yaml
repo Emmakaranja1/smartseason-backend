@@ -1,0 +1,26 @@
+services:
+  # Web Service
+  - type: web
+    name: smartseason-api
+    runtime: node
+    plan: free
+    buildCommand: "npm install && npm run db:generate"
+    startCommand: "npm start"
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+      - fromDatabase:
+          name: smartseason-db
+          property: connectionString
+          key: DATABASE_URL
+      - key: JWT_SECRET
+        generateValue: true
+
+  # PostgreSQL Database
+  - type: postgres
+    name: smartseason-db
+    plan: free
+    databaseName: smartseason
+    user: smartseason_user
