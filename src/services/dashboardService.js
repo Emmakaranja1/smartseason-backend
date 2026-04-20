@@ -92,6 +92,77 @@ const getAdminDashboard = async () => {
   }
 };
 
+const getAgentDashboard = async (agentId) => {
+  try {
+    // Get fields assigned to the agent
+    const assignedFields = await prisma.field.findMany({
+      where: {
+        assignedAgentId: agentId
+      },
+      include: {
+        assignedAgent: {
+          select: {
+            id: true,
+            name: true,
+            email: true
+          }
+        }
+      }
+    });
+
+    // Calculate status breakdown for agent's fields
+    let activeFields = 0;
+    let atRiskFields = 0;
+    let completedFields = 0;
+
+    const fieldsWithStatus = await Promise.all(
+      assignedFields.map(async (field) => {
+        const status = await calculateFieldStatus(field);
+        
+        if (status === 'ACTIVE') activeFields++;
+        else if (status === 'AT_RISK') atRiskFields++;
+        else if (status === 'COMPLETED') completedFields++;
+
+        return {
+          ...field,
+          status
+        };
+      })
+    );
+
+    // Filter at-risk fields
+    const atRiskFieldsList = fieldsWithStatus.filter(field => field.status === 'AT_RISK');
+
+    // Get recent updates for this agent
+    const recentUpdates = await prisma.fieldUpdate.findMany({
+      where: {
+        agentId: agentId
+      },
+      orderBy: {
+        createdAt: 'desc'
+      },
+      take: 5
+    });
+
+    const statusBreakdown = {
+      active: activeFields,
+      atRisk: atRiskFields,
+      completed: completedFields
+    };
+
+    return {
+      assignedFields: fieldsWithStatus,
+      statusBreakdown,
+      atRiskFields: atRiskFieldsList,
+      recentUpdates
+    };
+  } catch (error) {
+    console.error('Error in getAgentDashboard:', error);
+    throw { status: 500, message: 'Failed to fetch agent dashboard data' };
+  }
+};
+
 module.exports = {
-  getAdminDashboard
+  getAdminDashboard,
+  getAgentDashboard
 };
