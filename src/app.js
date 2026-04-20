@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const authRoutes = require('./routes/authRoutes');
 
 const app = express();
 
@@ -7,10 +8,10 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-// Base route
-app.use('/api', (req, res, next) => {
-  next();
-});
+
+
+// Routes
+app.use('/api/auth', authRoutes);
 
 // Health check route
 app.get('/api/health', (req, res) => {
