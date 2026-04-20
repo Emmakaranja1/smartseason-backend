@@ -11,3 +11,55 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+enum Role {
+  ADMIN
+  FIELD_AGENT
+}
+
+enum FieldStage {
+  PLANTED
+  GROWING
+  READY
+  HARVESTED
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  role      Role     @default(FIELD_AGENT)
+  createdAt DateTime @default(now())
+  
+  // Relationships
+  assignedFields    Field[]       @relation("FieldAgent")
+  fieldUpdates      FieldUpdate[]
+}
+
+model Field {
+  id              Int        @id @default(autoincrement())
+  name            String
+  cropType        String
+  plantingDate    DateTime
+  currentStage    FieldStage
+  assignedAgentId Int?
+  createdAt       DateTime   @default(now())
+  
+  // Relationships
+  assignedAgent User?        @relation("FieldAgent", fields: [assignedAgentId], references: [id])
+  fieldUpdates  FieldUpdate[]
+}
+
+model FieldUpdate {
+  id        Int        @id @default(autoincrement())
+  fieldId   Int
+  agentId   Int
+  stage     FieldStage
+  notes     String
+  createdAt DateTime   @default(now())
+  
+  // Relationships
+  field Field @relation(fields: [fieldId], references: [id])
+  agent User  @relation(fields: [agentId], references: [id])
+}
