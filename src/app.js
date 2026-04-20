@@ -13,6 +13,21 @@ app.use(cors());
 
 
 
+// Root route
+app.get('/', (req, res) => {
+  res.json({ 
+    message: 'SmartSeason Field Monitoring System API',
+    version: '1.0.0',
+    endpoints: {
+      auth: '/api/auth',
+      users: '/api/users',
+      fields: '/api/fields',
+      dashboard: '/api/dashboard',
+      health: '/api/health'
+    }
+  });
+});
+
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
