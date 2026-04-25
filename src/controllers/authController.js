@@ -13,6 +13,7 @@ const generateToken = (userId, role) => {
 };
 
 const login = async (req, res) => {
+  console.time('login-total');
   try {
     const { email, password } = req.body;
 
@@ -20,6 +21,7 @@ const login = async (req, res) => {
       return res.status(401).json({ error: 'Email and password are required' });
     }
 
+    console.time('login-db-query');
     const user = await prisma.user.findUnique({
       where: { email },
       select: {
@@ -30,18 +32,23 @@ const login = async (req, res) => {
         role: true
       }
     });
+    console.timeEnd('login-db-query');
 
     if (!user) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
+    console.time('login-bcrypt');
     const isPasswordValid = await bcrypt.compare(password, user.password);
+    console.timeEnd('login-bcrypt');
 
     if (!isPasswordValid) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
+    console.time('login-jwt');
     const token = generateToken(user.id, user.role);
+    console.timeEnd('login-jwt');
 
     const { password: _, ...userWithoutPassword } = user;
 
@@ -58,6 +65,8 @@ const login = async (req, res) => {
   } catch (error) {
     console.error('Login error:', error);
     res.status(500).json({ error: 'Internal server error' });
+  } finally {
+    console.timeEnd('login-total');
   }
 };
 
