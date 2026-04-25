@@ -7,46 +7,19 @@ const dashboardRoutes = require('./routes/dashboardRoutes');
 
 const app = express();
 
-const allowedOrigins = (process.env.CORS_ORIGINS || '')
-  .split(',')
-  .map((o) => o.trim())
-  .filter(Boolean);
-
-console.log('CORS Origins:', allowedOrigins);
-console.log('NODE_ENV:', process.env.NODE_ENV);
-console.log('CORS_ORIGINS env var:', process.env.CORS_ORIGINS);
-
 // Middleware
 app.use(express.json());
-app.use(
-  cors({
-    origin: function (origin, callback) {
-      console.log('CORS request from origin:', origin);
-      console.log('Allowed origins:', allowedOrigins);
-      
-      // allow requests with no origin (like mobile apps or curl requests)
-      if (!origin) {
-        console.log('No origin header, allowing request');
-        return callback(null, true);
-      }
-      
-      // check if origin is in allowed list
-      if (allowedOrigins.indexOf(origin) !== -1) {
-        console.log('Origin allowed:', origin);
-        return callback(null, true);
-      } else {
-        console.log('Origin rejected:', origin);
-        // don't throw error, just reject the origin
-        return callback(null, false);
-      }
-    },
-    credentials: true,
-    optionsSuccessStatus: 200, 
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    preflightContinue: false
-  })
-);
+
+// Simple CORS configuration for production
+const corsOptions = {
+  origin: ['http://localhost:5173', 'https://smartseasons-frontend.vercel.app'],
+  credentials: true,
+  optionsSuccessStatus: 200,
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
+};
+
+app.use(cors(corsOptions));
 
 
 
