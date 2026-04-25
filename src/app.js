@@ -16,12 +16,20 @@ const allowedOrigins = (process.env.CORS_ORIGINS || '')
 app.use(express.json());
 app.use(
   cors({
-    origin(origin, callback) {
-      // allow non-browser requests (no Origin header)
+    origin: function (origin, callback) {
+      // allow requests with no origin (like mobile apps or curl requests)
       if (!origin) return callback(null, true);
-      if (allowedOrigins.includes(origin)) return callback(null, true);
-      return callback(new Error(`CORS blocked for origin: ${origin}`), false);
+      
+      // check if origin is in allowed list
+      if (allowedOrigins.indexOf(origin) !== -1) {
+        return callback(null, true);
+      } else {
+        // don't throw error, just reject the origin
+        return callback(null, false);
+      }
     },
+    credentials: true,
+    optionsSuccessStatus: 200 // some legacy browsers choke on 204
   })
 );
 
