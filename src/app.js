@@ -29,7 +29,10 @@ app.use(
       }
     },
     credentials: true,
-    optionsSuccessStatus: 200 // some legacy browsers choke on 204
+    optionsSuccessStatus: 200, // some legacy browsers choke on 204
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    preflightContinue: false
   })
 );
 
