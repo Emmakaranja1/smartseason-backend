@@ -12,7 +12,7 @@ app.use(express.json());
 
 // Simple CORS configuration for production
 const corsOptions = {
-  origin: ['http://localhost:5173', 'https://smartseason-frontend-project.vercel.app'],
+  origin: ['http://localhost:5173', 'https://smartseason-frontend-project.vercel.app', 'https://smartseason-frontend-project-qbzjiqj9o-emmas-projects-edf04c29.vercel.app'],
   credentials: true,
   optionsSuccessStatus: 200,
   allowedHeaders: ['Content-Type', 'Authorization'],
